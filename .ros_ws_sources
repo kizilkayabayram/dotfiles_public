@@ -1,0 +1,4 @@
+source ~/gz_ws/install/setup.bash
+source ~/vrx_ws/install/setup.bash
+source ~/rviz_ws/install/setup.bash
+source ~/nav2_ws/install/setup.bash
