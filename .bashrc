@@ -8,9 +8,14 @@ source ~/.ros_ws_sources
 
 source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash
 
+# Avoid duplicates
+HISTCONTROL=ignoredups:erasedups
+# When the shell exits, append to the history file instead of overwriting it
+shopt -s histappend
 
-# share bash history
-export PROMPT_COMMAND="history -a; history -n"
+# After each command, append to the history file and reread it
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+
 
 alias setclip="xclip -selection c"
 alias getclip="xclip -selection c -o"
