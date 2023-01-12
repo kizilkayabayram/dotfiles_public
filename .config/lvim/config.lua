@@ -11,7 +11,7 @@ an executable
 -- general
 lvim.log.level = "warn"
 lvim.format_on_save.enabled = false
-lvim.colorscheme = "lunar"
+lvim.colorscheme = "tokyonight-moon"
 -- to disable icons and use a minimalist setup, uncomment the following
 -- lvim.use_icons = false
 
@@ -48,21 +48,18 @@ lvim.keys.normal_mode["<C-s>"] = ":w<cr>"
 -- lvim.builtin.theme.options.dim_inactive = true
 -- lvim.builtin.theme.options.style = "storm"
 
-
 -- Use which-key to add extra bindings with the leader-key prefix
 -- lvim.builtin.which_key.mappings["P"] = { "<cmd>Telescope projects<CR>", "Projects" }
-lvim.builtin.which_key.mappings["t"] = {
-  name = "+Trouble",
-  r = { "<cmd>Trouble lsp_references<cr>", "References" },
-  f = { "<cmd>Trouble lsp_definitions<cr>", "Definitions" },
-  d = { "<cmd>Trouble document_diagnostics<cr>", "Diagnostics" },
-  q = { "<cmd>Trouble quickfix<cr>", "QuickFix" },
-  l = { "<cmd>Trouble loclist<cr>", "LocationList" },
-  w = { "<cmd>Trouble workspace_diagnostics<cr>", "Workspace Diagnostics" },
-}
+-- lvim.builtin.which_key.mappings["t"] = {
+--   name = "+Trouble",
+--   r = { "<cmd>Trouble lsp_references<cr>", "References" },
+--   f = { "<cmd>Trouble lsp_definitions<cr>", "Definitions" },
+--   d = { "<cmd>Trouble document_diagnostics<cr>", "Diagnostics" },
+--   q = { "<cmd>Trouble quickfix<cr>", "QuickFix" },
+--   l = { "<cmd>Trouble loclist<cr>", "LocationList" },
+--   w = { "<cmd>Trouble workspace_diagnostics<cr>", "Workspace Diagnostics" },
+-- }
 
-
--- lvim.builtin.cmp.active = false
 
 
 local lspkind = require 'lspkind'
@@ -70,8 +67,6 @@ local lspkind = require 'lspkind'
 local cmp = require "cmp"
 local types = require "cmp.types"
 local str = require "cmp.utils.str"
-
-
 
 lvim.builtin.cmp.window = {
   completion = cmp.config.window.bordered(),
@@ -99,20 +94,75 @@ lvim.builtin.cmp.formatting.format = lspkind.cmp_format {
       spell = "暈",
     })[entry.source.name]
     -- Get the full snippet (and only keep first line)
-    local word = entry:get_insert_text()
-    if entry.completion_item.insertTextFormat == types.lsp.InsertTextFormat.Snippet then
-      word = vim.lsp.util.parse_snippet(word)
-    end
-    word = str.oneline(word)
-    if entry.completion_item.insertTextFormat == types.lsp.InsertTextFormat.Snippet
-        and string.sub(vim_item.abbr, -1, -1) == "~"
-    then
-      word = word .. "~"
-    end
-    vim_item.abbr = word
-    return vim_item
-  end,
+    -- local word = entry:
+get_insert_text()-- if entry.completion_item.insertTextFormat
+    == types.lsp.InsertTextFormat.Snippet then
+       -- word = vim.lsp.util.parse_snippet(word)-- end-- word =
+    str.oneline(word)-- if entry.completion_item.insertTextFormat
+        == types.lsp.InsertTextFormat.Snippet-- and
+    string.sub(vim_item.abbr, -1, -1) == "~" --then
+        -- word = word.."~" --end-- vim_item.abbr = word return vim_item end,
 }
+
+-- Additional Plugins
+lvim.plugins = {
+  {
+    "folke/trouble.nvim",
+    cmd = "TroubleToggle",
+  },
+  {
+    -- Vscode icons
+    "onsails/lspkind.nvim",
+  },
+  {
+    -- Doxygen generator
+    "danymat/neogen",
+    config = function()
+      require('neogen').setup {}
+    end,
+    tag = "*"
+  },
+  {
+    -- Fast line number navigation
+    "nacro90/numb.nvim",
+    event = "BufRead",
+    config = function()
+      require("numb").setup {
+        show_numbers = true, -- Enable 'number' for the window while peeking
+        show_cursorline = true, -- Enable 'cursorline' for the window while peeking
+      }
+    end,
+  },
+  { "folke/todo-comments.nvim",
+    event = "BufRead",
+    config = function()
+      require("todo-comments").setup()
+    end,
+  },
+  {
+    'nvim-telescope/telescope-fzf-native.nvim',
+    run = 'cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build',
+  },
+  {
+    "gauteh/vim-cppman",
+  },
+  {
+    "p00f/nvim-ts-rainbow",
+  },
+  {
+    "ray-x/lsp_signature.nvim",
+    event = "BufRead",
+    config = function() require "lsp_signature".on_attach() end,
+  },
+  {
+    "lvimuser/lsp-inlayhints.nvim",
+    config = function() require "lsp-inlayhints".on_attach() end,
+  },
+}
+lvim.builtin.telescope.on_config_done = function(telescope)
+  pcall(telescope.load_extension, "fzf")
+  -- any other extensions loading
+end
 
 -- TODO: User Config for predefined plugins
 -- After changing plugin config exit and reopen LunarVim, Run :PackerInstall :PackerCompile
@@ -125,6 +175,8 @@ lvim.builtin.nvimtree.setup.renderer.icons.show.git = false
 -- if you don't want all the parsers change this to a table of the ones you want
 lvim.builtin.treesitter.ensure_installed = {
   "bash",
+  "cpp",
+  "cmake",
   "c",
   "javascript",
   "json",
@@ -144,9 +196,10 @@ lvim.builtin.treesitter.highlight.enable = true
 -- generic LSP settings
 
 -- -- make sure server will always be installed even if the server is in skipped_servers list
-lvim.lsp.installer.setup.ensure_installed = {
-  "clangd",
-}
+-- lvim.lsp.installer.setup.ensure_installed = {
+--     "sumneko_lua",
+--     "jsonls",
+-- }
 -- -- change UI setting of `LspInstallInfo`
 -- -- see <https://github.com/williamboman/nvim-lsp-installer#default-configuration>
 -- lvim.lsp.installer.setup.ui.check_outdated_servers_on_open = false
@@ -164,6 +217,7 @@ lvim.lsp.installer.setup.ensure_installed = {
 -- vim.list_extend(lvim.lsp.automatic_configuration.skipped_servers, { "pyright" })
 -- local opts = {} -- check the lspconfig documentation for a list of all possible options
 -- require("lvim.lsp.manager").setup("pyright", opts)
+
 -- ---remove a server from the skipped list, e.g. eslint, or emmet_ls. !!Requires `:LvimCacheReset` to take effect!!
 -- ---`:LvimInfo` lists which server(s) are skipped for the current filetype
 -- lvim.lsp.automatic_configuration.skipped_servers = vim.tbl_filter(function(server)
@@ -183,115 +237,58 @@ lvim.lsp.installer.setup.ensure_installed = {
 -- -- set a formatter, this will override the language server formatting capabilities (if it exists)
 -- local formatters = require "lvim.lsp.null-ls.formatters"
 -- formatters.setup {
---   { command = "black", filetypes = { "python" } },
---   { command = "isort", filetypes = { "python" } },
---   {
---     -- each formatter accepts a list of options identical to https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
---     command = "prettier",
---     ---@usage arguments to pass to the formatter
---     -- these cannot contain whitespaces, options such as `--line-width 80` become either `{'--line-width', '80'}` or `{'--line-width=80'}`
---     extra_args = { "--print-with", "100" },
---     ---@usage specify which filetypes to enable. By default a providers will attach to all the filetypes it supports.
---     filetypes = { "typescript", "typescriptreact" },
---   },
--- }
+  --{command = "black", filetypes = {"python"}},
+      --{command = "isort", filetypes = {"python"}}, --{
+    -- --each formatter accepts a list of options identical to https
+        : // github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
+          --command = "prettier",
+          -- -- -@usage arguments to pass to the formatter-- --these cannot
+                    contain whitespaces,
+          options such as `--line - width 80` become either `{
+      '--line-width', '80'
+    }
+    ` or `{ '--line-width=80' }
+    ` --extra_args = {"--print-with", "100"},
+      -- -- -@usage specify which filetypes to enable
+                 .By default a providers will attach to all the filetypes it
+                     supports.--filetypes = {"typescript", "typescriptreact"},
+      --
+  }
+  , --
+}
 
--- -- set additional linters
--- local linters = require "lvim.lsp.null-ls.linters"
--- linters.setup {
---   { command = "flake8", filetypes = { "python" } },
---   {
---     -- each linter accepts a list of options identical to https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
---     command = "shellcheck",
---     ---@usage arguments to pass to the formatter
---     -- these cannot contain whitespaces, options such as `--line-width 80` become either `{'--line-width', '80'}` or `{'--line-width=80'}`
---     extra_args = { "--severity", "warning" },
---   },
---   {
---     command = "codespell",
---     ---@usage specify which filetypes to enable. By default a providers will attach to all the filetypes it supports.
-
---   },
--- }
+-- --set additional linters-- local linters =
+    require "lvim.lsp.null-ls.linters" --linters.setup {
+  --{command = "flake8", filetypes = {"python"}}, --{
+    -- --each linter accepts a list of options identical to https
+        : // github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTINS.md#Configuration
+          --command = "shellcheck",
+          -- -- -@usage arguments to pass to the formatter-- --these cannot
+                    contain whitespaces,
+          options such as `--line - width 80` become either `{
+      '--line-width', '80'
+    }
+    ` or `{ '--line-width=80' }
+    ` --extra_args = {"--severity", "warning"}, --
+  }
+  , --{
+    --command = "codespell",
+    -- -- -@usage specify which filetypes to enable
+               .By default a providers will attach to all the filetypes it
+                   supports.--filetypes = {"javascript", "python"},
+    --
+  }
+  , --
+}
 
 -- Additional Plugins
-lvim.plugins = {
-  {
-    "folke/trouble.nvim",
-    cmd = "TroubleToggle",
-  },
-  {
-    'sudormrfbin/cheatsheet.nvim',
-  },
-  {
-    "ray-x/lsp_signature.nvim",
-    event = "BufRead",
-    config = function() require "lsp_signature".on_attach() end,
-  },
-  {
-    "onsails/lspkind.nvim"
-  },
-  {
-    "danymat/neogen",
-    config = function()
-      require('neogen').setup {}
-    end,
-    requires = "nvim-treesitter/nvim-treesitter",
-    -- Uncomment next line if you want to follow only stable versions
-    tag = "*"
-  },
-  {
-    "nacro90/numb.nvim",
-    event = "BufRead",
-    config = function()
-      require("numb").setup {
-        show_numbers = true, -- Enable 'number' for the window while peeking
-        show_cursorline = true, -- Enable 'cursorline' for the window while peeking
-      }
-    end,
-  },
-  -- {
-  --   "ms-jpq/coq_nvim",
-  --   branch = "coq",
-  --   event = "InsertEnter",
-  --   opt = true,
-  --   run = ":COQdeps",
-  --   requires = {
-  --     { "ms-jpq/coq.artifacts", branch = "artifacts" },
-  --     { "ms-jpq/coq.thirdparty", branch = "3p", module = "coq_3p" },
-  --   },
-  --   disable = false,
-  --   config = function()
-  --     vim.g.coq_settings = {
-  --       auto_start = true,
-  --       clients = {
-  --         lsp = {
-  --           enabled = true,
-  --         },
-  --         tree_sitter = {
-  --           enabled = true,
-  --           weight_adjust = 1.0
-  --         },
-  --         tabnine = {
-  --           enabled = true,
-  --         }
-  --       },
-  --       display = {
-  --         icons = {
-  --           mappings = {
-  --             Text = "", Method = "", Function = "", Constructor = "", Field = "ﰠ", Variable = "",
-  --             Class = "ﴯ", Interface = "", Module = "", Property = "ﰠ", Unit = "塞", Value = "", Enum = "",
-  --             Keyword = "", Snippet = "", Color = "", File = "", Reference = "", Folder = "",
-  --             EnumMember = "", Constant = "", Struct = "פּ", Event = "", Operator = "", TypeParameter = ""
-  --           }
-  --         }
-  --       }
-  --     },
-  --     require('coq').lsp_ensure_capabilities()
-  --   end,
-  -- }
+-- lvim.plugins = {
+--     {
+--       "folke/trouble.nvim",
+--       cmd = "TroubleToggle",
+--     },
+-- }
 
-}
 -- Autocommands (https://neovim.io/doc/user/autocmd.html)
 -- vim.api.nvim_create_autocmd("BufEnter", {
 --   pattern = { "*.json", "*.jsonc" },
